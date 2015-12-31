@@ -20,6 +20,10 @@
       <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
       <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
     <![endif]-->
+<jsp:scriptlet>
+pageContext.setAttribute("newline", "\n");
+</jsp:scriptlet>
+   
 </head>
 <body>
 
@@ -72,7 +76,7 @@
 									</div>
 								</div>
 							</div>
-							<div class="panel-body">${row.contents}</div>
+							<div class="panel-body">${fn:replace(row.contents, newline, "<br/>")} </div>
 						</div>
 					</c:forEach>
 				</c:when>

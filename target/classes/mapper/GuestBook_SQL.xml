@@ -50,7 +50,8 @@
 		<![CDATA[
 			UPDATE guestbook 
 			SET
-				contents = #{contents}
+				contents = #{contents},
+				updated_at = NOW()
 			WHERE
 				idx = #{idx}
 		]]>
