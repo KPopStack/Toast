@@ -37,30 +37,6 @@ public class HomeController {
 	
 	@Resource(name="guestBookDAO")
 	private GuestBookDAO guestBookDAO;
-
-	/**
-	 * Simply selects the home view to render by returning its name.
-	 */
-	@RequestMapping(value = "/guestBookTest.do", method = RequestMethod.GET)
-	public String home(Locale locale, Model model) {
-		logger.info("Welcome home! The client locale is {}.", locale);
-		System.out.println("context.getAttribute:" + context.getAttribute("contextConfigLocation"));
-		//locale = Locale.US;
-		Date date = new Date();
-		DateFormat dateFormat = DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.LONG, locale);
-		
-		System.out.println("timezone:" + dateFormat.getTimeZone().getDisplayName());
-		
-		TimeZone time;
-		time = TimeZone.getTimeZone("America/Los_Angeles");
-		dateFormat.setTimeZone(time);
-
-		String formattedDate = dateFormat.format(date);
-		
-		model.addAttribute("serverTime", formattedDate );
-		
-		return "home";
-	}
 	
 	@RequestMapping(value="/guestBook.do")
     public ModelAndView openGuestBook(ParamMap paramMap) throws Exception{
@@ -74,25 +50,16 @@ public class HomeController {
         return mv;
     }
 	
-	@RequestMapping(value="/insertGuestBook_temp.do")
-    public ModelAndView insertGuestBook__s(ParamMap paramMap) throws Exception{
-        ModelAndView mv = new ModelAndView("home");
-        //logger.info("Map: ", commandMap.entrySet().toString());
-        logger.info("insertGuestBook: {}", paramMap);
-        EmailValidator emailValidator = new EmailValidator();
-        boolean isValid = emailValidator.validate(paramMap.get("email"));
-        
-        logger.info("Email Valid check : {}", isValid);
-        
-        return mv;
-    }
-	
 	@RequestMapping(value="/insertGuestBook.do")
 	public ModelAndView insertGuestBook(ParamMap map, HttpServletRequest request) throws Exception{
 		ModelAndView mv = new ModelAndView("redirect:/guestBook.do");
 		logger.info("insertGuestBook: {}", map);
-		
-		guestBookDAO.insertGuestBook(map.getMap());
+		EmailValidator emailValidator = new EmailValidator();
+        boolean isValid = emailValidator.validate(map.get("email"));
+        
+        if(isValid) {
+        	guestBookDAO.insertGuestBook(map.getMap());
+        }
 		
 		return mv;
 	}
