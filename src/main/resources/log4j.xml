@@ -11,7 +11,7 @@
 	</appender>
 	
 	<!-- Application Loggers -->
-	<logger name="com.nhnent.toastguestbook">
+	<logger name="toast">
 		<level value="info" />
 	</logger>
 	

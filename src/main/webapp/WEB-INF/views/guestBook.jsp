@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -53,46 +54,85 @@
 			</form>
 		</div>
 		<div class="panel-group">
-			<div class="panel panel-default">
-				<div class="panel-heading">
-					<div class="row">
-						<div class="col-sm-10">Panel with panel-default class</div>
-						<div class="btn-group btn-group-xs col-sm-2">
-							<button type="button" class="btn btn-primary">수정</button>
-							<button type="button" class="btn btn-primary">삭제</button>
+			<c:choose>
+				<c:when test="${fn:length(list) > 0}">
+					<c:forEach items="${list}" var="row">
+						<div class="panel panel-default">
+							<div class="panel-heading">
+								<div class="row">
+									<div class="col-sm-10">${row.email}</div>
+									<div class="btn-group btn-group-xs col-sm-2">
+										<input type="hidden" id="EMAIL" value="${row.email }">
+										<input type="hidden" id="CONTENTS" value="${row.contents }">
+										</td>
+										<button type="button" class="btn btn-primary"
+											data-toggle="modal" data-target="#myModal"
+											data-whatever=${row.idx }>수정</button>
+										<button type="button" class="btn btn-primary">삭제</button>
+									</div>
+								</div>
+							</div>
+							<div class="panel-body">${row.contents}</div>
 						</div>
+					</c:forEach>
+				</c:when>
+				<c:otherwise>
+					<div class="panel panel-default">
+						<div class="panel-body">작성된 글이 없습니다.</div>
+					</div>
+				</c:otherwise>
+			</c:choose>
+		</div>
+	</div>
+
+
+	<div class="modal fade" role="dialog" id="myModal"
+		aria-labelledby="gridSystemModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal"
+						aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+					<h4 class="modal-title" id="gridSystemModalLabel">수정하기</h4>
+				</div>
+				<div class="modal-body">
+					<div class="container-fluid">
+						<form class="form-horizontal" id="frmUpdate"
+							action="<c:url value='/updateGuestBook.do' />" method="post">
+							<div class="form-group">
+								<input type="hidden" id="updateIDX" name="idx" />
+								<label for="inputEmail3" class="col-sm-2 control-label">Email</label>
+								<div class="col-sm-4">
+									<input type="email" class="form-control" id="updateEmail" disabled>
+								</div>
+
+								<label for="inputPassword3" class="col-sm-2 control-label">Password</label>
+								<div class="col-sm-4">
+									<input type="password" class="form-control" id="updatePassword"
+										name="passwd" placeholder="Password">
+								</div>
+							</div>
+							<div class="form-group">
+								<div class="col-sm-offset-2 col-sm-10">
+									<textarea class="form-control" rows="3" name="contents" id="updateContents"></textarea>
+								</div>
+							</div>
+						</form>
 					</div>
 				</div>
-				<div class="panel-body">Panel Content</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+					<button type="button" class="btn btn-primary" id="updateConfirm">Save
+						changes</button>
+				</div>
 			</div>
-
-			<div class="panel panel-primary">
-				<div class="panel-heading">Panel with panel-primary class</div>
-				<div class="panel-body">Panel Content</div>
-			</div>
-
-			<div class="panel panel-success">
-				<div class="panel-heading">Panel with panel-success class</div>
-				<div class="panel-body">Panel Content</div>
-			</div>
-
-			<div class="panel panel-info">
-				<div class="panel-heading">Panel with panel-info class</div>
-				<div class="panel-body">Panel Content</div>
-			</div>
-
-			<div class="panel panel-warning">
-				<div class="panel-heading">Panel with panel-warning class</div>
-				<div class="panel-body">Panel Content</div>
-			</div>
-
-			<div class="panel panel-danger">
-				<div class="panel-heading">Panel with panel-danger class</div>
-				<div class="panel-body">Panel Content</div>
-			</div>
+			<!-- /.modal-content -->
 		</div>
-
+		<!-- /.modal-dialog -->
 	</div>
+	<!-- /.modal -->
 
 	<!-- jQuery (부트스트랩의 자바스크립트 플러그인을 위해 필요합니다) -->
 	<script
@@ -102,13 +142,32 @@
 	<script src="js/common.js"></script>
 
 	<script>
+		$('#myModal').on('show.bs.modal', function(event) {
+			var button = $(event.relatedTarget) // Button that triggered the modal
+			var idx = button.data('whatever') // Extract info from data-* attributes
+			// If necessary, you could initiate an AJAX request here (and then do the updating in a callback).
+			// Update the modal's content. We'll use jQuery here, but you could use a data binding library or other methods instead.
+			var email = button.parent().find("#EMAIL").val()
+			var contents = button.parent().find("#CONTENTS").val()
+			var modal = $(this)
+			modal.find('#updateIDX').val(idx)
+			modal.find('#updateEmail').val(email)
+			modal.find('#updateContents').text(contents)
+			//modal.find('.modal-title').text('New message to ' + recipient)
+			//modal.find('.modal-body input').val(recipient)
+		})
+
+		$("#updateConfirm").on("click", function(e) { //글쓰기 버튼
+			e.preventDefault()
+			$("#frmUpdate").submit()
+		});
 
 		$("#frmPosting").submit(function(event) {
 			var email = $('#inputEmail').val()
 
 			if (!email_check(email)) {
-				alert('잘못된 형식의 이메일 주소입니다.');
-				event.preventDefault();
+				alert('잘못된 형식의 이메일 주소입니다.')
+				event.preventDefault()
 			}
 		});
 	</script>

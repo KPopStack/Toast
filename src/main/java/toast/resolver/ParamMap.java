@@ -17,4 +17,8 @@ public class ParamMap {
     public String toString() {
         return map.toString();
     }
+    
+    public Map<String, String> getMap(){
+        return map;
+    }
 }

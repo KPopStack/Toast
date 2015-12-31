@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="guestbook">
+	
+	<select id="selectGuestBook" parameterType="hashmap" resultType="hashmap">
+		<![CDATA[
+			SELECT
+			    idx,
+			    email,
+			    contents,
+			    created_at,
+			    updated_at
+			FROM
+			    guestbook
+			ORDER BY
+				ifnull(updated_at, created_at) DESC
+		]]>
+	</select>
+
+	<select id="getGuestBookByIdx" parameterType="int" resultType="hashmap">
+		<![CDATA[
+			SELECT
+			    *
+			FROM
+			    guestbook
+			WHERE
+				idx = #{idx}
+		]]>
+	</select>
+
+	<insert id="insertGuestBook" parameterType="hashmap">
+		<![CDATA[
+			INSERT INTO guestbook
+			(
+				email,
+				passwd,
+				contents
+			)
+			VALUES
+			(
+				#{email},
+				#{passwd},
+				#{content}
+			)
+		]]>
+	</insert>
+
+	<update id="updateGuestBook" parameterType="hashmap">
+		<![CDATA[
+			UPDATE guestbook 
+			SET
+				contents = #{contents}
+			WHERE
+				idx = #{idx}
+		]]>
+	</update>
+
+	<delete id="deleteGuestBook" parameterType="hashmap">
+		<![CDATA[
+			DELETE FROM guestbook
+			WHERE 
+				idx = #{idx};
+		]]>
+	</delete>
+
+</mapper>
